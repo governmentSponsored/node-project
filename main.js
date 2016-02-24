@@ -3,16 +3,24 @@ var tools = require('./hello'),
 	fs = require('fs'),
 	http = require('http'),
 	stream = require('stream'),
-	options = {portOne: 1337, portTwo: 1338, portThree: 1339, portFour: 1340};
+	options = 
+	{
+		portOne: 1337, 
+		portTwo: 1338, 
+		portThree: 1339, 
+		portFour: 1340, 
+		portFive: 1341
+	};
 
 //just messing with console message that gets written
-tools.cute(options);
+tools.curlInstructions(options);
 
 //create multiple ports to listen to different requests
 http.createServer(onRequestOneThreeThreeSeven).listen(options.portOne);
 http.createServer(onRequestOneThreeThreeEight).listen(options.portTwo);
 http.createServer(onRequestOneThreeThreeNine).listen(options.portThree);
 http.createServer(onRequestOneThreeFourZero).listen(options.portFour);
+http.createServer(onRequestOneThreeFourOne).listen(options.portFive);
 
 //working with the stream API here. Just starting off with a quick pipe response to a request.
 //here is where you use: curl -d "string" http://localhost:1337
@@ -50,4 +58,26 @@ function onRequestOneThreeFourZero (req, res) {
 	req.on('end', function() {
 		res.end('uploaded with 1340 function');
 	});	
+}
+
+//more complex file upload with response that includes upload progress
+function onRequestOneThreeFourOne (req, res) {
+	var largeFile = fs.createWriteStream('image_copy.jpg'),
+		fileSize = req.headers['content-length'],
+		uploadSize = 0,
+		chunk = null,
+		progress = 0;
+
+	req.on('readable', function() {
+		while(null !== (chunk = req.read())) {
+			uploadSize += chunk.length;
+			progress = (uploadSize / fileSize) * 100;
+			res.write('Percent Complete: ' + parseInt(progress, 10) + "%\n");
+		}
+	});
+
+	req.pipe(largeFile);
+	req.on('end', function() {
+		res.end('file finished uploading');
+	});
 }
