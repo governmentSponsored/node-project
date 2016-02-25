@@ -1,0 +1,20 @@
+{
+	"name": "node project",
+	"version": "0.1",
+	"description": "just trying to learn some node.js :)",
+	"author": "stan@stanleysmith.net",
+	"scripts": {
+		"start": "nodejs main.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/governmentSponsored/node-project"
+	},
+	"dependencies": {
+		"path": "5.7.0",
+		"fs": "5.7.0",
+		"util": "5.7.0",
+		"stream": "5.7.0",
+		"http": "5.7.0"
+	}
+}
