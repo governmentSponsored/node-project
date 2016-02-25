@@ -42,5 +42,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-#custom stuff
+#don't load files that are used for streaming/copying
 *.jpg
+*.mp3

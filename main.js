@@ -3,6 +3,8 @@ var tools = require('./hello'),
 	fs = require('fs'),
 	http = require('http'),
 	stream = require('stream'),
+	util = require('util'),
+	path = require('path'),
 	options = 
 	{
 		portOne: {curlInput: 'curl -d "string"', portNumber: 1337, curlOutput: 'Returns string in console'},
@@ -81,3 +83,19 @@ function onRequestOneThreeFourOne (req, res) {
 		res.end('file finished uploading');
 	});
 }
+
+//stream an mp3!! very cool.
+http.createServer(function(request, response) {
+    var filePath = path.join(__dirname, 'footballpodcast.mp3');
+    var stat = fs.statSync(filePath);
+    
+    response.writeHead(200, {
+        'Content-Type': 'audio/mpeg', 
+        'Content-Length': stat.size
+    });
+    
+    var readStream = fs.createReadStream(filePath);
+    // We replaced all the event handlers with a simple call to util.pump()
+    util.pump(readStream, response);
+})
+.listen(2000);
