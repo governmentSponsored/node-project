@@ -1,4 +1,4 @@
-//require libraries and files
+//require libraries, files, and port info
 var tools = require('./hello'),
 	fs = require('fs'),
 	http = require('http'),
@@ -7,11 +7,12 @@ var tools = require('./hello'),
 	path = require('path'),
 	options = 
 	{
-		portOne: {curlInput: 'curl -d "string"', portNumber: 1337, curlOutput: 'Returns string in console'},
-		portTwo: {curlInput: 'curl', portNumber: 1338, curlOutput: 'Returns index.html file contents'},
-		portThree: {curlInput: 'curl', portNumber: 1339, curlOutput: 'Copies README.md'},
-		portFour: {curlInput: 'curl --upload-file "file_name.md"', portNumber: 1340, curlOutput: 'Will copy .md file that is passed in'},
-		portFive: {curlInput: 'curl --upload-file "image_name.jpg"', portNumber: 1341, curlOutput: 'Will copy .jpg that is passed in and display progress'}
+		portOne: {instructions: 'curl -d "string"', portNumber: 1337, outcome: 'Returns string in console'},
+		portTwo: {instructions: 'curl', portNumber: 1338, outcome: 'Returns index.html file contents'},
+		portThree: {instructions: 'curl', portNumber: 1339, outcome: 'Copies README.md'},
+		portFour: {instructions: 'curl --upload-file "file_name.md"', portNumber: 1340, outcome: 'Will copy .md file that is passed in'},
+		portFive: {instructions: 'curl --upload-file "image_name.jpg"', portNumber: 1341, outcome: 'Will copy .jpg that is passed in and display progress'},
+		portSix: {instructions: 'do not curl. In your browser visit', portNumber: 1342, outcome: 'Will stream an mp3'}
 	};
 
 //just messing with console message that gets written
@@ -23,6 +24,7 @@ http.createServer(onRequestOneThreeThreeEight).listen(options.portTwo.portNumber
 http.createServer(onRequestOneThreeThreeNine).listen(options.portThree.portNumber);
 http.createServer(onRequestOneThreeFourZero).listen(options.portFour.portNumber);
 http.createServer(onRequestOneThreeFourOne).listen(options.portFive.portNumber);
+http.createServer(onRequestOneThreeFourTwo).listen(options.portSix.portNumber);
 
 //working with the stream API here. Just starting off with a quick pipe response to a request.
 //here is where you use: curl -d "string" http://localhost:1337
@@ -85,17 +87,16 @@ function onRequestOneThreeFourOne (req, res) {
 }
 
 //stream an mp3!! very cool.
-http.createServer(function(request, response) {
-    var filePath = path.join(__dirname, 'footballpodcast.mp3');
-    var stat = fs.statSync(filePath);
+function onRequestOneThreeFourTwo (req, res) {
+	var filePath = path.join(__dirname, 'footballpodcast.mp3'),
+    	stat = fs.statSync(filePath),
+    	readStream = fs.createReadStream(filePath);
     
-    response.writeHead(200, {
+    res.writeHead(200, {
         'Content-Type': 'audio/mpeg', 
         'Content-Length': stat.size
     });
     
-    var readStream = fs.createReadStream(filePath);
-    // We replaced all the event handlers with a simple call to util.pump()
-    util.pump(readStream, response);
-})
-.listen(2000);
+    
+    util.pump(readStream, res);
+}
